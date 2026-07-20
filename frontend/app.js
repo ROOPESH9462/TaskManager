@@ -13,6 +13,7 @@ const taskForm = document.getElementById('task-form');
 const taskTitleInput = document.getElementById('task-title');
 const taskDescInput = document.getElementById('task-desc');
 const taskDateInput = document.getElementById('task-date');
+const taskTimeInput = document.getElementById('task-time');
 
 // Drag and Drop State variables
 let draggedCard = null;
@@ -112,6 +113,9 @@ function createTaskCard(task) {
   card.dataset.status = task.status;
   card.dataset.dueDate = task.dueDate;
 
+  // Extract time from description if present
+  const { timeStr, cleanDesc } = parseTimeFromDescription(task.description);
+
   // Use textContent for user input to avoid XSS injections
   const title = document.createElement('h3');
   title.className = 'task-card-title';
@@ -119,8 +123,8 @@ function createTaskCard(task) {
 
   const desc = document.createElement('p');
   desc.className = 'task-card-desc';
-  desc.textContent = task.description || 'No description provided';
-  if (!task.description) {
+  desc.textContent = cleanDesc || 'No description provided';
+  if (!cleanDesc) {
     desc.style.fontStyle = 'italic';
     desc.style.opacity = '0.5';
   }
@@ -149,7 +153,7 @@ function createTaskCard(task) {
   `;
   
   const dateText = document.createElement('span');
-  dateText.textContent = formatDate(task.dueDate);
+  dateText.textContent = formatDate(task.dueDate) + (timeStr ? ` @ ${formatTime(timeStr)}` : '');
   dateContainer.appendChild(dateText);
 
   // Style overdue tasks (only if they aren't already completed)
@@ -461,8 +465,9 @@ async function handleFormSubmit(e) {
   e.preventDefault();
 
   const title = taskTitleInput.value.trim();
-  const description = taskDescInput.value.trim();
+  let description = taskDescInput.value.trim();
   const dueDate = taskDateInput.value;
+  const dueTime = taskTimeInput ? taskTimeInput.value : '';
 
   // Validation checks
   if (!title) {
@@ -472,6 +477,11 @@ async function handleFormSubmit(e) {
   if (!dueDate) {
     showToast('Due date is required.', 'warning');
     return;
+  }
+
+  // If a time is specified, append it to description string
+  if (dueTime) {
+    description = description ? `${description}\n\n[Time: ${dueTime}]` : `[Time: ${dueTime}]`;
   }
 
   const payload = {
@@ -727,4 +737,29 @@ async function handleClearCompleted() {
   setTimeout(() => {
     showToast('Completed tasks cleared successfully!', 'success');
   }, 450);
+}
+
+// Helper to parse time suffix from description
+function parseTimeFromDescription(description) {
+  let timeStr = '';
+  let cleanDesc = description || '';
+  const timeRegex = /\[Time:\s*(\d{2}:\d{2})\]/;
+  const match = cleanDesc.match(timeRegex);
+  if (match) {
+    timeStr = match[1];
+    cleanDesc = cleanDesc.replace(timeRegex, '').trim();
+  }
+  return { timeStr, cleanDesc };
+}
+
+// Format 24h time to 12h AM/PM format
+function formatTime(timeStr) {
+  if (!timeStr) return '';
+  const [hoursStr, minutesStr] = timeStr.split(':');
+  let hours = parseInt(hoursStr, 10);
+  const minutes = minutesStr;
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // hour 0 should be 12
+  return `${hours}:${minutes} ${ampm}`;
 }

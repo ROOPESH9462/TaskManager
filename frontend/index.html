@@ -119,9 +119,15 @@
           <label for="task-desc">Description</label>
           <textarea id="task-desc" placeholder="Add some details about this task..." rows="4" maxlength="500"></textarea>
         </div>
-        <div class="form-group">
-          <label for="task-date">Due Date</label>
-          <input type="date" id="task-date" required>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="task-date">Due Date</label>
+            <input type="date" id="task-date" required>
+          </div>
+          <div class="form-group">
+            <label for="task-time">Time</label>
+            <input type="time" id="task-time">
+          </div>
         </div>
         <div class="form-actions">
           <button type="button" id="cancel-task-btn" class="btn btn-secondary">Cancel</button>

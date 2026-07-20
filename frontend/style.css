@@ -700,6 +700,15 @@ body {
   gap: 1.25rem;
 }
 
+.form-row {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.form-row .form-group {
+  flex: 1;
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
