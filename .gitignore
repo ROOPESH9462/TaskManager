@@ -1,0 +1,10 @@
+# Java build artifacts
+bin/
+
+# Temporary / Scratch files
+scratch/
+*.log
+
+# OS metadata
+.DS_Store
+Thumbs.db
