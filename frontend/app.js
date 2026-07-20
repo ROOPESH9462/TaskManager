@@ -1,5 +1,7 @@
-// API Base URL Configuration
-const API_BASE_URL = 'http://localhost:8080/api';
+// API Base URL Configuration (Detects local vs production)
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:8080/api'
+  : 'https://YOUR-RENDER-BACKEND-URL.onrender.com/api'; // <-- REPLACE with your actual Render service URL
 
 // State Management
 let tasksState = [];
